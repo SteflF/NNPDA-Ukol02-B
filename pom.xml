@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.javabrains</groupId>
-	<artifactId>NNPDA-Ukol01-A</artifactId>
+	<artifactId>nnpd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>NNPDA-Ukol01-A</name>
-	<description>Semestralni prace A</description>
-
+	<name>nnpda</name>
+	<description>Semestralni prace B</description>
+	<packaging>jar</packaging>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -31,11 +31,6 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api-parent</artifactId>
-			<version>2.3.1</version>
 		</dependency>
 
 		<!-- API, java.xml.bind module -->
@@ -57,9 +52,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!-- mysql db -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -104,6 +101,7 @@
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>
