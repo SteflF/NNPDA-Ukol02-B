@@ -2,15 +2,17 @@ package io.javabrains.nnpda.services.impl;
 
 import io.javabrains.nnpda.services.EmailSenderService;
 import io.javabrains.nnpda.services.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 @Service("emailService")
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private EmailSenderService emailSenderService;
+    private final EmailSenderService emailSenderService;
+
+    public EmailServiceImpl(EmailSenderService emailSenderService) {
+        this.emailSenderService = emailSenderService;
+    }
 
     @Override
     public void sendPasswordRecoveryEmail(String to, String token) {

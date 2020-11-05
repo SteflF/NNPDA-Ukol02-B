@@ -1,15 +1,18 @@
 package io.javabrains.nnpda.controllers;
 
+import io.javabrains.nnpda.model.ApiResponse;
 import io.javabrains.nnpda.config.JwtUtil;
 import io.javabrains.nnpda.model.*;
 import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
@@ -17,35 +20,46 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping( value = "/security")
 public class AccountController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private SecurityService securityService;
+    private final UserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final SecurityService securityService;
+
+    private final JwtUtil jwtUtil;
+
+    public AccountController(AuthenticationManager authenticationManager, UserService userService, SecurityService securityService, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+        this.securityService = securityService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping
     @RequestMapping(value = "/authenticate")
-    public ResponseEntity<?> CreateAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+    public ApiResponse<AuthenticationResponse> Authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException {
+        User user = doAuthenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
+        if (user != null) {
+            final String jwtToken = jwtUtil.generateToken(user);
+            AuthenticationResponse response = new AuthenticationResponse(user.getUsername(), user.getRole().getName(), jwtToken);
+
+            return new ApiResponse<>(200, "SUCCESS", response);
+        }
+
+        return new ApiResponse<>(HttpStatus.NOT_ACCEPTABLE.value(), "INVALID-CREDENTIALS", null);
+    }
+
+    private User doAuthenticate(String username, String password) {
         try {
-            // The Spring Security Authentication Manager calls 'loadUserByUsername' method for getting the user details
-            // from the database when authenticating the user details provided by the user.
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUserName(), authenticationRequest.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            return userService.findOne(username);
+        } catch (Exception ex) {
+            log.warn("Invalid Credentials: \n  username: " + username + "\n  password: " + password);
         }
-        catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password", e);
-        }
-
-        final User user = userService.findOne(authenticationRequest.getUserName());
-
-        final String jwtToken = jwtUtil.generateToken(user);
-
-        return ResponseEntity.ok(new AuthenticationResponse(jwtToken));
+        return null;
     }
 
     @PostMapping

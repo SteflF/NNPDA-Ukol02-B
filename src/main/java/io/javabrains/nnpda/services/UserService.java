@@ -5,7 +5,7 @@ import io.javabrains.nnpda.model.User;
 import io.javabrains.nnpda.model.UserInputModel;
 
 public interface UserService {
-    User findOne(String userName);
+    User findOne(String username);
 
     User save(UserInputModel user);
 

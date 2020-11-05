@@ -4,7 +4,6 @@ import io.javabrains.nnpda.model.Author;
 import io.javabrains.nnpda.model.BookAuthor;
 import io.javabrains.nnpda.repository.BookAuthorRepository;
 import io.javabrains.nnpda.services.AuthorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,8 +12,11 @@ import java.util.List;
 @Service("authorService")
 public class AuthorServiceImpl implements AuthorService {
 
-    @Autowired
-    private BookAuthorRepository bookAuthorRepository;
+    private final BookAuthorRepository bookAuthorRepository;
+
+    public AuthorServiceImpl(BookAuthorRepository bookAuthorRepository) {
+        this.bookAuthorRepository = bookAuthorRepository;
+    }
 
     @Override
     public List<Author> findByBookId(int bookId) {

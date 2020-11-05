@@ -8,7 +8,6 @@ import io.javabrains.nnpda.services.BookService;
 import io.javabrains.nnpda.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +19,17 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private BookService bookService;
+    private final BookService bookService;
 
-    @Autowired
-    private AuthorService authorService;
+    private final AuthorService authorService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(BookService bookService, AuthorService authorService, UserService userService) {
+        this.bookService = bookService;
+        this.authorService = authorService;
+        this.userService = userService;
+    }
 
     @GetMapping
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})

@@ -29,7 +29,7 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public String recoverPassword(RecoverPasswordInputModel inputModel) {
         String userName = inputModel.getUserName();
-        User user = userRepository.findByUserName(userName);
+        User user = userRepository.findByUsername(userName);
 
         if (user != null) {
             String token = generateUUID();

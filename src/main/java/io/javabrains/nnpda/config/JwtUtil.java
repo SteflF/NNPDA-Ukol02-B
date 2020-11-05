@@ -18,8 +18,8 @@ public class JwtUtil {
     private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60; // 1 hodina
     private static final String SIGNING_KEY = "secretkey";
 
-    // extract userName from token
-    public String extractUserName(String token) {
+    // extract username from token
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -49,7 +49,7 @@ public class JwtUtil {
     // generate token for user
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, user.getUserName());
+        return createToken(claims, user.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -64,7 +64,7 @@ public class JwtUtil {
 
     // validate token
     public Boolean validateToken(String token, UserDetails user) {
-        final String userName = extractUserName(token);
-        return (userName.equals(user.getUsername()) && !isTokenExpired(token));
+        final String username = extractUsername(token);
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
 }

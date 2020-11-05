@@ -12,10 +12,14 @@ public class User {
     private int id;
 
     @Column(name = "username")
-    private String userName;
+    private String username;
 
     @Column(name = "password")
     private String password;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Book> book;
@@ -27,9 +31,10 @@ public class User {
     public User() {
     }
 
-    public User(String userName, String password, UserToken userToken) {
-        this.userName = userName;
+    public User(String username, String password, Role role, UserToken userToken) {
+        this.username = username;
         this.password = password;
+        this.role = role;
         this.userToken = userToken;
     }
 
@@ -41,12 +46,12 @@ public class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
     public String getPassword() {
@@ -55,6 +60,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public UserToken getUserToken() {

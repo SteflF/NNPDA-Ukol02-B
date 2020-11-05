@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
-    private String username;
-    private String role;
-    private String jwtToken;
+public class ApiResponse<T> {
+    private int status;
+    private String status_key;
+    private T result;
 }
