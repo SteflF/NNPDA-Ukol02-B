@@ -1,5 +1,6 @@
-package io.javabrains.nnpda.model;
+package io.javabrains.nnpda.model.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,11 +10,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Entity
-@Table(name = "role")
+@Entity(name = "role")
 public class Role {
 
     @Id
+    @Getter
+    @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -23,6 +25,8 @@ public class Role {
     private String name;
 
     @Getter
+    @Setter
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "role")
+    @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
     private final List<User> users = new ArrayList<>();
 }

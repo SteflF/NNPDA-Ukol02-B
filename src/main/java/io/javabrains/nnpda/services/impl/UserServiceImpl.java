@@ -1,11 +1,12 @@
 package io.javabrains.nnpda.services.impl;
 
-import io.javabrains.nnpda.model.ChangePasswordInputModel;
-import io.javabrains.nnpda.model.User;
-import io.javabrains.nnpda.model.UserInputModel;
+import io.javabrains.nnpda.model.dto.ChangePasswordInputModel;
+import io.javabrains.nnpda.model.db.User;
+import io.javabrains.nnpda.model.dto.UserInputModel;
 import io.javabrains.nnpda.repository.RoleRepository;
 import io.javabrains.nnpda.repository.UserRepository;
 import io.javabrains.nnpda.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +16,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
-@Service(value = "userService")
+@Service("userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final UserRepository userRepository;
@@ -29,6 +28,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final BCryptPasswordEncoder bcryptEncoder;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bcryptEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -47,10 +47,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
-    private List<SimpleGrantedAuthority> getAuthority() {
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
-    }
-
     @Override
     public User findOne(String username) {
         Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
@@ -62,7 +58,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User save(UserInputModel user) {
         User newUser = new User();
 
-        newUser.setUsername(user.getUserName());
+        newUser.setUsername(user.getUsername());
         newUser.setPassword(user.getPassword() == null ? null : bcryptEncoder.encode(user.getPassword()));
         newUser.setRole(roleRepository.findByName("USER").orElse(null));
 
@@ -72,7 +68,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public Boolean changePassword(ChangePasswordInputModel inputModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        var username = ((UserDetails)auth.getPrincipal()).getUsername();
+        String username = ((UserDetails)auth.getPrincipal()).getUsername();
 
         if (!username.isEmpty()) {
             User user = userRepository.findByUsername(username);
@@ -86,5 +82,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
 
         return false;
+    }
+
+    @Override
+    public Boolean alreadyRegistered(String username) {
+        //User user = userRepository.findByUsername(username);
+
+        return userRepository.findByUsername(username) != null;
     }
 }

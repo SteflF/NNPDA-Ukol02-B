@@ -1,10 +1,11 @@
 package io.javabrains.nnpda.config;
 
-import io.javabrains.nnpda.model.User;
+import io.javabrains.nnpda.model.db.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Service
+@Service(value = "jwtUtil")
 public class JwtUtil {
 
     private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60; // 1 hodina

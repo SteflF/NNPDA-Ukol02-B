@@ -1,6 +1,6 @@
 package io.javabrains.nnpda.repository;
 
-import io.javabrains.nnpda.model.Role;
+import io.javabrains.nnpda.model.db.Role;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

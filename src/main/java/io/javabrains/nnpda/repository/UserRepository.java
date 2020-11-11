@@ -1,6 +1,6 @@
 package io.javabrains.nnpda.repository;
 
-import io.javabrains.nnpda.model.User;
+import io.javabrains.nnpda.model.db.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +10,6 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     //User findByUserTokenId(Integer id);
 
-    User findByUserTokenName(String token);
+    //User findByRecoverToken_Token(String token);
+    User findByRecoverToken_Token(String recoverToken_token);
 }

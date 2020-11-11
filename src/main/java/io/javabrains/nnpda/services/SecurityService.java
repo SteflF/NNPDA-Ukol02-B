@@ -1,7 +1,7 @@
 package io.javabrains.nnpda.services;
 
-import io.javabrains.nnpda.model.RecoverPasswordInputModel;
-import io.javabrains.nnpda.model.ResetPasswordInputModel;
+import io.javabrains.nnpda.model.dto.RecoverPasswordInputModel;
+import io.javabrains.nnpda.model.dto.ResetPasswordInputModel;
 
 public interface SecurityService {
     String recoverPassword(RecoverPasswordInputModel inputModel);

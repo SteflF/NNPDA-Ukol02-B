@@ -1,8 +1,8 @@
 package io.javabrains.nnpda.services;
 
-import io.javabrains.nnpda.model.ChangePasswordInputModel;
-import io.javabrains.nnpda.model.User;
-import io.javabrains.nnpda.model.UserInputModel;
+import io.javabrains.nnpda.model.dto.ChangePasswordInputModel;
+import io.javabrains.nnpda.model.db.User;
+import io.javabrains.nnpda.model.dto.UserInputModel;
 
 public interface UserService {
     User findOne(String username);
@@ -10,4 +10,6 @@ public interface UserService {
     User save(UserInputModel user);
 
     Boolean changePassword(ChangePasswordInputModel inputModel);
+
+    Boolean alreadyRegistered(String username);
 }

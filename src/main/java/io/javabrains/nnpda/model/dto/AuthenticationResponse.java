@@ -1,4 +1,4 @@
-package io.javabrains.nnpda.model;
+package io.javabrains.nnpda.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
