@@ -4,7 +4,7 @@ import io.javabrains.nnpda.model.db.Device;
 import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.repository.DeviceRepository;
 import io.javabrains.nnpda.services.DeviceService;
-import io.javabrains.nnpda.services.SecurityContextService;
+import io.javabrains.nnpda.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +15,17 @@ import java.util.List;
 public class DeviceServiceImpl implements DeviceService {
 
     private final DeviceRepository deviceRepository;
-
-    private final SecurityContextService securityContextService;
+    private final SecurityService securityService;
 
     @Autowired
-    public DeviceServiceImpl(DeviceRepository deviceRepository, SecurityContextService securityContextService) {
+    public DeviceServiceImpl(DeviceRepository deviceRepository, SecurityService securityService) {
         this.deviceRepository = deviceRepository;
-        this.securityContextService = securityContextService;
+        this.securityService = securityService;
     }
 
     @Override
     public List<Device> findAllUserDevices() {
-        User user = securityContextService.GetAuthenticatedUser();
+        User user = securityService.GetAuthenticatedUser();
         List<Device> devices = new ArrayList<>();
 
         if (user != null) {

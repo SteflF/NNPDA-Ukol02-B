@@ -3,7 +3,7 @@ package io.javabrains.nnpda.services.impl;
 import io.javabrains.nnpda.model.db.Sensor;
 import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.repository.SensorRepository;
-import io.javabrains.nnpda.services.SecurityContextService;
+import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,12 @@ import java.util.List;
 public class SensorServiceImpl implements SensorService {
 
     private final SensorRepository sensorRepository;
-
-    private final SecurityContextService securityContextService;
+    private final SecurityService securityService;
 
     @Autowired
-    public SensorServiceImpl(SensorRepository sensorRepository, SecurityContextService securityContextService) {
+    public SensorServiceImpl(SensorRepository sensorRepository, SecurityService securityService) {
         this.sensorRepository = sensorRepository;
-        this.securityContextService = securityContextService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -40,7 +39,7 @@ public class SensorServiceImpl implements SensorService {
 
     @Override
     public List<Sensor> findByDeviceId(int deviceId) {
-        User user = securityContextService.GetAuthenticatedUser();
+        User user = securityService.GetAuthenticatedUser();
         List<Sensor> sensors = new ArrayList<>();
 
         if(user != null){

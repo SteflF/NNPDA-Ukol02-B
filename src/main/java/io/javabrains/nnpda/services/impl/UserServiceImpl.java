@@ -5,11 +5,10 @@ import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.model.dto.UserInputModel;
 import io.javabrains.nnpda.repository.RoleRepository;
 import io.javabrains.nnpda.repository.UserRepository;
+import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,16 +22,16 @@ import java.util.Optional;
 public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final UserRepository userRepository;
-
     private final RoleRepository roleRepository;
-
     private final BCryptPasswordEncoder bcryptEncoder;
+    private final SecurityService securityService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bcryptEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bcryptEncoder, SecurityService securityService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.bcryptEncoder = bcryptEncoder;
+        this.securityService = securityService;
     }
 
     // called by authenticationManager.authenticate to get the user from database
@@ -67,18 +66,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public Boolean changePassword(ChangePasswordInputModel inputModel) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = ((UserDetails)auth.getPrincipal()).getUsername();
+        User user = securityService.GetAuthenticatedUser();
 
-        if (!username.isEmpty()) {
-            User user = userRepository.findByUsername(username);
+        if ((user != null) && (user.getPassword().equals(bcryptEncoder.encode(inputModel.getOldPassword())))) {
+            user.setPassword(inputModel.getNewPassword());
+            userRepository.save(user);
 
-            if ((user != null) && (user.getPassword().equals(bcryptEncoder.encode(inputModel.getOldPassword())))) {
-                user.setPassword(inputModel.getNewPassword());
-                userRepository.save(user);
-
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -86,8 +80,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public Boolean alreadyRegistered(String username) {
-        //User user = userRepository.findByUsername(username);
-
         return userRepository.findByUsername(username) != null;
     }
 }

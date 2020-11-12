@@ -4,13 +4,12 @@ import io.javabrains.nnpda.model.ApiResponse;
 import io.javabrains.nnpda.model.dto.*;
 import io.javabrains.nnpda.config.JwtUtil;
 import io.javabrains.nnpda.model.db.User;
-import io.javabrains.nnpda.services.SecurityContextService;
 import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.UserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,25 +18,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping( value = "/api/security")
 public class AccountController {
 
-    private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final SecurityService securityService;
     private final JwtUtil jwtUtil;
-    private final SecurityContextService securityContextService;
 
     @Autowired
-    public AccountController(AuthenticationManager authenticationManager, UserService userService, SecurityService securityService, JwtUtil jwtUtil, SecurityContextService securityContextService) {
-        this.authenticationManager = authenticationManager;
+    public AccountController(UserService userService, SecurityService securityService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.securityService = securityService;
         this.jwtUtil = jwtUtil;
-        this.securityContextService = securityContextService;
     }
 
     @PostMapping("/authenticate")
     public ApiResponse<AuthenticationResponse> Authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException {
         //User user = doAuthenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        User user = securityContextService.AuthenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        //User user = securityContextService.AuthenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        User user = securityService.AuthenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         if (user != null) {
             final String jwtToken = jwtUtil.generateToken(user);
@@ -75,35 +71,45 @@ public class AccountController {
     }
 
     @PostMapping("/recoverPassword")
-    public ResponseEntity<?> RecoverPassword(@RequestBody RecoverPasswordInputModel inputModel) {
+    public ApiResponse<String> RecoverPassword(@RequestBody RecoverPasswordInputModel inputModel) {
         String token = securityService.recoverPassword(inputModel);
 
         if (!token.isBlank()) {
-            return ResponseEntity.status(HttpStatus.OK).body("Token: " + token);
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", null);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chyba");
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", null);
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<?> ResetPassword(@RequestBody ResetPasswordInputModel inputModel) {
+    public ApiResponse<Void> ResetPassword(@RequestBody ResetPasswordInputModel inputModel) {
         Boolean result = securityService.resetPassword(inputModel);
 
         if (result) {
-            return ResponseEntity.status(HttpStatus.OK).body("Reset hesla proběhl úspěšně.");
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", null);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Chyba.");
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", null);
     }
 
     @PostMapping("/validateResetPasswordToken/{token}")
-    public ResponseEntity<?> TokenValidation(@PathVariable String token) {
+    public ApiResponse<Void> TokenValidation(@PathVariable String token) {
         Boolean isValid = securityService.resetPasswordTokenValidation(token);
 
         if (isValid) {
-            return ResponseEntity.status(HttpStatus.OK).body("Token je validni: " + token);
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", null);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token je nevalidni.");
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", null);
+    }
+
+    @PutMapping("/changePassword")
+    @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
+    public ApiResponse<Void> ChangePassword(@RequestBody ChangePasswordInputModel inputModel) {
+        if (userService.changePassword(inputModel)) {
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", null);
+        }
+
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", null);
     }
 }

@@ -6,7 +6,7 @@ import io.javabrains.nnpda.model.db.Sensor;
 import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.model.dto.MeasurementInputModel;
 import io.javabrains.nnpda.services.MeasurementService;
-import io.javabrains.nnpda.services.SecurityContextService;
+import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.SensorService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -20,20 +20,20 @@ import org.springframework.web.bind.annotation.*;
 public class MeasurementController {
 
     private final MeasurementService measurementService;
-    private final SecurityContextService securityContextService;
+    private final SecurityService securityService;
     private final SensorService sensorService;
 
     @Autowired
-    public MeasurementController(MeasurementService measurementService, SecurityContextService securityContextService, SensorService sensorService) {
+    public MeasurementController(MeasurementService measurementService, SecurityService securityService, SensorService sensorService) {
         this.measurementService = measurementService;
-        this.securityContextService = securityContextService;
+        this.securityService = securityService;
         this.sensorService = sensorService;
     }
 
     @PostMapping("/")
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
     public ApiResponse<Measurement> saveMeasurement(@RequestBody MeasurementInputModel data){
-        User user = securityContextService.GetAuthenticatedUser();
+        User user = securityService.GetAuthenticatedUser();
         Sensor sensor = sensorService.findById(data.getSensorId());
 
         if (sensor != null) {

@@ -6,7 +6,7 @@ import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.model.dto.MeasurementInputModel;
 import io.javabrains.nnpda.repository.MeasurementRepository;
 import io.javabrains.nnpda.services.MeasurementService;
-import io.javabrains.nnpda.services.SecurityContextService;
+import io.javabrains.nnpda.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,12 @@ import org.springframework.stereotype.Service;
 public class MeasurementServiceImpl implements MeasurementService {
 
     private final MeasurementRepository measurementRepository;
-
-    private final SecurityContextService securityContextService;
+    private final SecurityService securityService;
 
     @Autowired
-    public MeasurementServiceImpl(MeasurementRepository measurementRepository, SecurityContextService securityContextService) {
+    public MeasurementServiceImpl(MeasurementRepository measurementRepository, SecurityService securityService) {
         this.measurementRepository = measurementRepository;
-        this.securityContextService = securityContextService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -37,7 +36,7 @@ public class MeasurementServiceImpl implements MeasurementService {
 
     @Override
     public boolean delete(int id) {
-        User user = securityContextService.GetAuthenticatedUser();
+        User user = securityService.GetAuthenticatedUser();
         Measurement measurement = measurementRepository.findByIdAndUser_Id(id, user.getId()).orElse(null);
 
         if(measurement != null){
