@@ -32,7 +32,6 @@ public class AccountController {
     @PostMapping("/authenticate")
     public ApiResponse<AuthenticationResponse> Authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException {
         //User user = doAuthenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        //User user = securityContextService.AuthenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         User user = securityService.AuthenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         if (user != null) {

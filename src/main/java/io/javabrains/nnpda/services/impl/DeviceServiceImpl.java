@@ -2,6 +2,7 @@ package io.javabrains.nnpda.services.impl;
 
 import io.javabrains.nnpda.model.db.Device;
 import io.javabrains.nnpda.model.db.User;
+import io.javabrains.nnpda.model.dto.DeviceInputModel;
 import io.javabrains.nnpda.repository.DeviceRepository;
 import io.javabrains.nnpda.services.DeviceService;
 import io.javabrains.nnpda.services.SecurityService;
@@ -34,5 +35,26 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         return devices;
+    }
+
+    @Override
+    public Device createDevice(DeviceInputModel device) {
+        User user = securityService.GetAuthenticatedUser();
+
+        if (user != null){
+            Device newDevice = new Device();
+
+            newDevice.setName(device.getName());
+            newDevice.setUser(securityService.GetAuthenticatedUser());
+
+            return deviceRepository.save(newDevice);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Boolean deviceAlreadyExists(DeviceInputModel device) {
+        return deviceRepository.existsByName(device.getName());
     }
 }

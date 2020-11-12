@@ -2,6 +2,7 @@ package io.javabrains.nnpda.config;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
+    @Autowired
     public JwtRequestFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }

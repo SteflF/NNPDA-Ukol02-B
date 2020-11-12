@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@Service(value = "jwtUtil")
+//@Service(value = "jwtUtil")
+@Component
 public class JwtUtil {
 
     private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60; // 1 hodina

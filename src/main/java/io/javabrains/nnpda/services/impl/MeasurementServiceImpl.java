@@ -10,7 +10,7 @@ import io.javabrains.nnpda.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("dataService")
+@Service("measurementService")
 public class MeasurementServiceImpl implements MeasurementService {
 
     private final MeasurementRepository measurementRepository;
