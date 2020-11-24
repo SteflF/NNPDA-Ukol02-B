@@ -9,8 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface MeasurementRepository extends CrudRepository<Measurement, Integer> {
-    //List<Data> findAllBySensorIdAndUserIdOrderByDate(Integer sensorId, Integer userId);
-    //List<Data> findAllBySensor_IdAndUser_IdOrderByDate(Integer sensorId, Integer userId);
+    List<Measurement> findAllBySensorIdAndUser_Id(Integer sensorId, Integer userId);
 
     //Optional<Data> findByIdAndUserId(Integer id, Integer userId);
     //Optional<Data> findByIdAndUserId(Integer id, Integer user_id);

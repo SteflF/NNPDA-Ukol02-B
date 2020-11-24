@@ -30,6 +30,12 @@ public class DeviceController {
         return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", deviceService.findAllUserDevices());
     }
 
+    @GetMapping("/devices/{id}")
+    @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
+    public ApiResponse<Device> GetUserDevice(@PathVariable int id) {
+        return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", deviceService.findById(id));
+    }
+
     @PostMapping("/create")
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
     public ApiResponse<Device> CreateDevice(@RequestBody DeviceInputModel deviceInputModel) {
@@ -42,6 +48,35 @@ public class DeviceController {
             return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", device);
         }else {
             return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "CANNOT-CREATE", null);
+        }
+    }
+
+    @PutMapping("/edit/{id}")
+    @ApiOperation(value = "", authorizations = {@Authorization(value = "jwtToken")})
+    public ApiResponse<Device> EditDevice(@PathVariable int id, @RequestBody DeviceInputModel deviceInputModel) {
+        if (deviceService.findById(id) == null) {
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "CANNOT-FIND", null);
+        }
+
+        Device device = deviceService.editDevice(id, deviceInputModel);
+        if (device != null) {
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", device);
+        }else {
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "CANNOT-EDIT", null);
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ApiOperation(value = "", authorizations = {@Authorization(value = "jwtToken")})
+    public ApiResponse<Device> DeleteDevice(@PathVariable int id) {
+        if (deviceService.findById(id) == null) {
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "CANNOT-FIND", null);
+        }
+
+        if (deviceService.deleteDevice(id)) {
+            return new ApiResponse<>(HttpStatus.OK.value(), "SUCCESS", null);
+        }else {
+            return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "CANNOT-DELETE", null);
         }
     }
 }

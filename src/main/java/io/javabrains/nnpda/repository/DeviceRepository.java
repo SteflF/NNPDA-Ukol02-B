@@ -13,6 +13,10 @@ public interface DeviceRepository extends CrudRepository<Device, Integer> {
 
     Optional<Device> findById(int id);
 
+    Optional<Device> findByIdAndName(int id, String name);
+
+    Optional<Device> findByIdAndUser_Id(int id, int user_id);
+
     Boolean existsByName(String name);
 
     //Optional<Device> findByIdAndUserUsername(Integer id, String user_username);

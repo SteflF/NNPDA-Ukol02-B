@@ -10,5 +10,11 @@ public interface DeviceService {
 
     Device createDevice(DeviceInputModel device);
 
+    Device editDevice(int id, DeviceInputModel device);
+
+    Boolean deleteDevice(int id);
+
+    Device findById(int id);
+
     Boolean deviceAlreadyExists(DeviceInputModel device);
 }
