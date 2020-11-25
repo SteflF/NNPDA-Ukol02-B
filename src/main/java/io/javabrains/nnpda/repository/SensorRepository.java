@@ -13,6 +13,8 @@ public interface SensorRepository extends CrudRepository<Sensor, Integer> {
     //Optional<Sensor> findByIdAndUser_Id(Integer id, Integer userId);
     Optional<Sensor> findByIdAndUser_Id(int id, int user_id);
 
+    Optional<Sensor> findByIdAndDevice_Id(int id, int device_id);
+
     boolean existsByName(String name);
 
     //List<Sensor> findAllByDeviceIdAndUserId(Integer deviceId, Integer userId);

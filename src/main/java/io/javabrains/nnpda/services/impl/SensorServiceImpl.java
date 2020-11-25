@@ -1,7 +1,12 @@
 package io.javabrains.nnpda.services.impl;
 
+import io.javabrains.nnpda.model.db.Device;
+import io.javabrains.nnpda.model.db.Measurement;
 import io.javabrains.nnpda.model.db.Sensor;
 import io.javabrains.nnpda.model.db.User;
+import io.javabrains.nnpda.model.dto.SensorInputModel;
+import io.javabrains.nnpda.repository.DeviceRepository;
+import io.javabrains.nnpda.repository.MeasurementRepository;
 import io.javabrains.nnpda.repository.SensorRepository;
 import io.javabrains.nnpda.services.SecurityService;
 import io.javabrains.nnpda.services.SensorService;
@@ -14,11 +19,15 @@ import java.util.List;
 @Service("sensorService")
 public class SensorServiceImpl implements SensorService {
 
+    private final DeviceRepository deviceRepository;
+    private final MeasurementRepository measurementRepository;
     private final SensorRepository sensorRepository;
     private final SecurityService securityService;
 
     @Autowired
-    public SensorServiceImpl(SensorRepository sensorRepository, SecurityService securityService) {
+    public SensorServiceImpl(DeviceRepository deviceRepository, MeasurementRepository measurementRepository, SensorRepository sensorRepository, SecurityService securityService) {
+        this.deviceRepository = deviceRepository;
+        this.measurementRepository = measurementRepository;
         this.sensorRepository = sensorRepository;
         this.securityService = securityService;
     }
@@ -38,6 +47,59 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
+    public Sensor createSensor(SensorInputModel sensor) {
+        User user = securityService.GetAuthenticatedUser();
+        Device device = deviceRepository.findById(sensor.getDeviceId()).orElse(null);
+
+        if (device != null && user != null) {
+            Sensor newSensor = new Sensor();
+
+            newSensor.setName(sensor.getName());
+            newSensor.setUser(user);
+            newSensor.setDevice(device);
+
+            return sensorRepository.save(newSensor);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Sensor editSensor(int id, SensorInputModel sensorIM) {
+        User user = securityService.GetAuthenticatedUser();
+        Sensor sensor = sensorRepository.findByIdAndDevice_Id(id, sensorIM.getDeviceId()).orElse(null);
+
+        if (user != null && sensor != null) {
+
+            sensor.setName(sensorIM.getName());
+
+            return sensorRepository.save(sensor);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Boolean deleteSensor(int id) {
+        User user = securityService.GetAuthenticatedUser();
+        Sensor sensor = sensorRepository.findById(id).orElse(null);
+
+        if (user != null && sensor != null) {
+            List<Measurement> measurements = measurementRepository.findAllBySensorIdAndUser_Id(id, user.getId());
+
+            for (Measurement measurement:measurements) {
+                measurementRepository.delete(measurement);
+            }
+
+            sensorRepository.delete(sensor);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public List<Sensor> findByDeviceId(int deviceId) {
         User user = securityService.GetAuthenticatedUser();
         List<Sensor> sensors = new ArrayList<>();
@@ -48,14 +110,11 @@ public class SensorServiceImpl implements SensorService {
             return sensors;
         }
 
-        //bookAuthorRepository.findByBookId(bookId).iterator().forEachRemaining(bookAuthors::add);
-        //bookAuthorRepository.findByBookId(bookId).iterator().forEachRemaining((bookAuthor -> sensors.add(bookAuthor.getAuthor())));
-/*
-        for (var bookAuthor:bookAuthors
-        ) {
-            authors.add(bookAuthor.getAuthor());
-        }
-*/
         return sensors;
+    }
+
+    @Override
+    public Boolean sensorAlreadyExists(SensorInputModel sensor) {
+        return sensorRepository.existsByName(sensor.getName());
     }
 }
