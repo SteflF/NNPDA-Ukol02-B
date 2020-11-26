@@ -3,6 +3,7 @@ package io.javabrains.nnpda.controllers;
 import io.javabrains.nnpda.model.ApiResponse;
 import io.javabrains.nnpda.model.db.Sensor;
 import io.javabrains.nnpda.model.dto.SensorInputModel;
+import io.javabrains.nnpda.model.dto.SensorViewModel;
 import io.javabrains.nnpda.services.SensorService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -38,12 +39,12 @@ public class SensorController {
 
     @PostMapping("/create")
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
-    public ApiResponse<Sensor> CreateSensor(@RequestBody SensorInputModel sensor) {
+    public ApiResponse<SensorViewModel> CreateSensor(@RequestBody SensorInputModel sensor) {
         if (sensorService.sensorAlreadyExists(sensor)) {
             return new ApiResponse<>(HttpStatus.NOT_ACCEPTABLE.value(), "ALREADY-EXISTS", null);
         }
 
-        Sensor result = sensorService.createSensor(sensor);
+        SensorViewModel result = sensorService.createSensor(sensor);
         if (result != null) {
             return new ApiResponse<>(200, "SUCCESS", result);
         }else {
@@ -82,7 +83,7 @@ public class SensorController {
 
     @GetMapping("/deviceSensors/{id}")
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
-    public ApiResponse<List<Sensor>> GetDeviceSensors(@PathVariable int id) {
+    public ApiResponse<List<SensorViewModel>> GetDeviceSensors(@PathVariable int id) {
         return new ApiResponse<>(200, "SUCCESS", sensorService.findByDeviceId(id));
     }
 }

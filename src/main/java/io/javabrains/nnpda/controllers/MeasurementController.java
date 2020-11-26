@@ -26,6 +26,6 @@ public class MeasurementController {
     @GetMapping("/{id}")
     @ApiOperation(value = "", authorizations = { @Authorization(value = "jwtToken")})
     public ApiResponse<Measurement> GetMeasurement(@PathVariable int id) {
-        return new ApiResponse<>(200, "SUCCESS", null);
+        return new ApiResponse<>(200, "SUCCESS", measurementService.getLatest(id));
     }
 }

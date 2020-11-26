@@ -3,6 +3,7 @@ package io.javabrains.nnpda;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 @EnableSwagger2
+@EnableScheduling
 public class NnpdaApplication {
 
 	public static void main(String[] args) {

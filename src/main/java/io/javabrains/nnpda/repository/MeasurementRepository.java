@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface MeasurementRepository extends CrudRepository<Measurement, Integer> {
     List<Measurement> findAllBySensorIdAndUser_Id(Integer sensorId, Integer userId);
 
+    Optional<Measurement> findFirstBySensor_IdOrderByDateDesc(int sensorId);
+
     //Optional<Data> findByIdAndUserId(Integer id, Integer userId);
     //Optional<Data> findByIdAndUserId(Integer id, Integer user_id);
     Optional<Measurement> findByIdAndUser_Id(Integer id, Integer user_id);

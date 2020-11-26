@@ -5,6 +5,7 @@ import io.javabrains.nnpda.model.db.Measurement;
 import io.javabrains.nnpda.model.db.Sensor;
 import io.javabrains.nnpda.model.db.User;
 import io.javabrains.nnpda.model.dto.SensorInputModel;
+import io.javabrains.nnpda.model.dto.SensorViewModel;
 import io.javabrains.nnpda.repository.DeviceRepository;
 import io.javabrains.nnpda.repository.MeasurementRepository;
 import io.javabrains.nnpda.repository.SensorRepository;
@@ -47,7 +48,7 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public Sensor createSensor(SensorInputModel sensor) {
+    public SensorViewModel createSensor(SensorInputModel sensor) {
         User user = securityService.GetAuthenticatedUser();
         Device device = deviceRepository.findById(sensor.getDeviceId()).orElse(null);
 
@@ -57,8 +58,9 @@ public class SensorServiceImpl implements SensorService {
             newSensor.setName(sensor.getName());
             newSensor.setUser(user);
             newSensor.setDevice(device);
+            sensorRepository.save(newSensor);
 
-            return sensorRepository.save(newSensor);
+            return new SensorViewModel(newSensor.getId(), newSensor.getName(), 0);
         }
 
         return null;
@@ -100,17 +102,24 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public List<Sensor> findByDeviceId(int deviceId) {
+    public List<SensorViewModel> findByDeviceId(int deviceId) {
         User user = securityService.GetAuthenticatedUser();
-        List<Sensor> sensors = new ArrayList<>();
 
         if(user != null){
-            sensorRepository.findAllByDevice_IdAndUser_Id(deviceId, user.getId()).iterator().forEachRemaining(sensors::add);
+            List<Sensor> sensors = sensorRepository.findAllByDevice_IdAndUser_Id(deviceId, user.getId());
+            List<SensorViewModel> sensorsVM = new ArrayList<>();
 
-            return sensors;
+            for (Sensor sensor:sensors) {
+                Measurement measurement = measurementRepository.findFirstBySensor_IdOrderByDateDesc(sensor.getId()).orElse(null);
+                sensorsVM.add(new SensorViewModel(sensor.getId(), sensor.getName(), measurement != null ? measurement.getValue() : 0));
+            }
+
+            //sensorRepository.findAllByDevice_IdAndUser_Id(deviceId, user.getId()).iterator().forEachRemaining(sensors::add);
+
+            return sensorsVM;
         }
 
-        return sensors;
+        return null;
     }
 
     @Override
